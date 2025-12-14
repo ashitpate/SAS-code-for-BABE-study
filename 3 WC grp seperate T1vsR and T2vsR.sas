@@ -10,9 +10,6 @@ datalines;
 1004 T1T2R 1 T1 1 85.828
 1004 T1T2R 2 T2 1 78.869
 1004 T1T2R 3 R  1 77.818
-1005 RT1T2 1 R  1 117.806
-1005 RT1T2 2 T1 1 0.00
-1005 RT1T2 3 T2 1 93.787
 1006 T2RT1 1 T2 1 48.721
 1006 T2RT1 2 R  1 44.209
 1006 T2RT1 3 T1 1 72.733
@@ -28,9 +25,6 @@ datalines;
 1010 RT1T2 1 R  1 96.786
 1010 RT1T2 2 T1 1 87.225
 1010 RT1T2 3 T2 1 85.133
-1011 T2RT1 1 T2 1 111.14
-1011 T2RT1 2 R  1 84.257
-1011 T2RT1 3 T1 1 0.00
 1012 T1T2R 1 T1 1 57.431
 1012 T1T2R 2 T2 1 69.217
 1012 T1T2R 3 R  1 83.866
@@ -46,9 +40,6 @@ datalines;
 1016 T2RT1 1 T2 2 102.813
 1016 T2RT1 2 R  2 91.063
 1016 T2RT1 3 T1 2 93.372
-1017 RT1T2 1 R  2 90.29
-1017 RT1T2 2 T1 2 0.00
-1017 RT1T2 3 T2 2 90.306
 1018 T1T2R 1 T1 2 119.537
 1018 T1T2R 2 T2 2 146.835
 1018 T1T2R 3 R  2 99.671
@@ -58,14 +49,35 @@ run;
 data pkdata_log;
 set pkdata;
 logCmax = log(Cmax);
+logAUC = log(AUC);
 run;
 
-proc mixed data=pkdata_log;
+data pk_t1r;
+set pkdata_log;
+if Formulation in ('T1', 'R');
+run;
+
+data pk_t2r;
+set pkdata_log;
+if Formulation in ('T2', 'R');
+run;
+
+ods output Estimates=est_cmax_t1r LSMeans=lsm_cmax_t1r Diffs=diff_cmax_t1r 
+           CovParms=cov_cmax_t1r;
+proc mixed data=pk_t1r;
 class Seq Sub_id Period Group Formulation;
 model logCmax = Group Seq Group*Seq Formulation Period(Group);
 random Sub_id(Seq*Group);
 lsmeans Formulation / pdiff=control("R") cl alpha=0.10;
-estimate 'T1 / R' Formulation 1 0 -1 / cl alpha=0.10;
-estimate 'T2 / R' Formulation 0 1 -1 / cl alpha=0.10;
-title 'TEST';
+estimate 'T1 vs R' Formulation 1 -1;
+title 'Cmax Analysis: T1 vs R';
+run;
+
+proc mixed data=pk_t2rr;
+class Seq Sub_id Period Group Formulation;
+model logCmax = Group Seq Group*Seq Formulation Period(Group);
+random Sub_id(Seq*Group);
+lsmeans Formulation / pdiff=control("R") cl alpha=0.10;
+estimate 'T2 vs R' Formulation 1 -1;
+title 'Cmax Analysis: T2 vs R';
 run;
