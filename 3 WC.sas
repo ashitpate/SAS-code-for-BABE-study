@@ -1,7 +1,7 @@
 data pkdata;
 input Sub_id $ Seq $ Period Formulation $ Cmax AUC;
 datalines;
-/* enter your data here */
+/*type your data below this line according to the input structure*/
 001 T1RT2 1 R 150 1200
 ;
 run;
