@@ -33,12 +33,9 @@ Key study components addressed:
 ---
 
 ## SAS Procedures Utilized
-- `PROC SORT` – Data ordering and integrity
 - `PROC MEANS` – Descriptive PK statistics
 - `PROC GLM` – Preliminary ANOVA models
 - `PROC MIXED` – Mixed-effects modeling for replicate designs
-- `PROC TRANSPOSE` – Dataset restructuring
-- `DATA Step Programming` – Data derivation and validation
 
 ---
 
